@@ -1,10 +1,12 @@
 name: "PetKit Local (404alex)"
 description: "Local cloud replacement for PetKit litter boxes, feeders, fountains and accessories"
-version: "2.1.0-404alex.1"
+version: "2.1.1"
 slug: "petkitlocal"
 url: "https://github.com/404alex/petkit-local"
-# Fork: no `image:`, so the Supervisor builds the Dockerfile on the host
-# (BuildKit, see the Dockerfile header). Nothing is published to a registry.
+# Pull the fork's published image (.github/workflows/publish.yml builds it on a
+# `v*` tag). The Supervisor pulls `image:version`, so a release is not usable
+# until the matching tag has been published.
+image: "ghcr.io/404alex/petkit-local"
 #
 # armv7 works only because the Dockerfile gives 32-bit ARM a glibc base — on the
 # musl one the other arches use, `cryptography` has no wheel and would have to

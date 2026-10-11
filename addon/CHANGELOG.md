@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.1.1 — 2026-10-11
+
+404alex fork, based on alexmorbo/petkit-local (upstream 2.1.0 plus the changes
+listed under the sections below).
+
+- **Published from this fork.** `config.yaml` points at
+  `ghcr.io/404alex/petkit-local`, built by this repository's publish workflow,
+  instead of upstream's 2.1.0 image, which lacks the D4H fixes below.
+- **D4H scheduled meals dispense.** A single-hopper YumShare Solo is served a
+  single `a` per meal (portions x 10) instead of the Dual-Hopper `a1`/`a2`, on
+  `dev_feed_get` and on the live `property.set` push (upstream #29, #36).
+- **The device keeps its UTC offset.** The state-report `time` carries the
+  device's own offset rather than `+0000` (upstream #30).
+
 ## Unreleased
 
 - **Each pet's Home Assistant device now shows its last toilet visit and last
