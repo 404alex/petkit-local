@@ -1,6 +1,6 @@
 name: "PetKit Local (404alex)"
 description: "Local cloud replacement for PetKit litter boxes, feeders, fountains and accessories"
-version: "2.1.1"
+version: "2.1.2"
 slug: "petkitlocal"
 url: "https://github.com/404alex/petkit-local"
 # Pull the fork's published image (.github/workflows/publish.yml builds it on a

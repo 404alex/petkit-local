@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.1.2 — 2026-10-11
+
+Picked from dernassesmart/petkit-local.
+
+- **Feeding events reach Home Assistant.** Event discovery no longer templates
+  the bare `event_type`, and the HTTP path publishes the MQTT event name HA
+  lists instead of the device's numeric code, so the Feeding Event entity
+  fires with the event's payload (`real_amount`, `err_code`) (dernassesmart
+  2.1.11).
+- **A heartbeat-only device is announced after a restart.** The heartbeat
+  handler reports the offline-to-online transition itself instead of leaving
+  the device unavailable until its next state report (dernassesmart 2.1.10).
+- **Schedule editor fixes (upstream PR #31).** The feeder weekday selector
+  writes `re`, the key the device reads, and the time field is no longer
+  repainted while it is being typed.
+
 ## 2.1.1 — 2026-10-11
 
 404alex fork, based on alexmorbo/petkit-local (upstream 2.1.0 plus the changes
