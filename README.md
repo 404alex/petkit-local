@@ -2,10 +2,11 @@
 
 > **This is a fork.** [404alex/petkit-local](https://github.com/404alex/petkit-local) is built on
 > [alexmorbo/petkit-local](https://github.com/alexmorbo/petkit-local), which is itself a fork of
-> [alex-so-3/petkit-local](https://github.com/alex-so-3/petkit-local). Upstream has had no commits
-> since 2.1.0 (2026-08-12), and the fixes a single-hopper YumShare Solo (D4H) needs to feed on
-> schedule are still unmerged there. This fork carries them, publishes its own image to
-> `ghcr.io/404alex/petkit-local`, and runs against a YumShare Solo (D4H, firmware 865).
+> [alex-so-3/petkit-local](https://github.com/alex-so-3/petkit-local), the original project and the
+> work almost all of this repository is. It exists to run a single-hopper YumShare Solo (D4H,
+> firmware 865) with a few fixes the community has proposed for that model, packaged as an add-on
+> with its own image at `ghcr.io/404alex/petkit-local`. If they land upstream, upstream is the
+> better place to be.
 >
 > What it adds on top of upstream 2.1.0:
 >
