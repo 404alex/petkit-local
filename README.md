@@ -1,5 +1,33 @@
 # PetKit Local
 
+> **This is a fork.** [404alex/petkit-local](https://github.com/404alex/petkit-local) is built on
+> [alexmorbo/petkit-local](https://github.com/alexmorbo/petkit-local), which is itself a fork of
+> [alex-so-3/petkit-local](https://github.com/alex-so-3/petkit-local). Upstream has had no commits
+> since 2.1.0 (2026-08-12), and the fixes a single-hopper YumShare Solo (D4H) needs to feed on
+> schedule are still unmerged there. This fork carries them, publishes its own image to
+> `ghcr.io/404alex/petkit-local`, and runs against a YumShare Solo (D4H, firmware 865).
+>
+> What it adds on top of upstream 2.1.0:
+>
+> - **D4H scheduled meals dispense.** A single-hopper feeder reads one `a` per meal, in portions × 10,
+>   not the Dual-Hopper's `a1`/`a2`. Handed `a1`/`a2` it runs the whole feed cycle and puts out
+>   nothing (`real_amount: 0, err_code: 8`). From alexmorbo; upstream
+>   [#36](https://github.com/alex-so-3/petkit-local/issues/36) and
+>   [#29](https://github.com/alex-so-3/petkit-local/pull/29).
+> - **The device keeps its timezone.** The state-report reply carries the device's own UTC offset
+>   instead of `+0000`, which had the clock drifting back to UTC and meals firing hours off. From
+>   alexmorbo; upstream [#30](https://github.com/alex-so-3/petkit-local/pull/30).
+> - **The D4H food level reads the right way round** in Food Low, plus alexmorbo's other fixes
+>   (fountain controls, MQTT 5 refusal, ESP32 Aliyun routing, per-pet sensors).
+> - **Feeding events reach Home Assistant** with their payload, a heartbeat-only device is announced
+>   after a restart, and the feeder schedule editor's weekday and time fields work. From
+>   dernassesmart (2.1.10, 2.1.11) and upstream PR [#31](https://github.com/alex-so-3/petkit-local/pull/31).
+>
+> Every change is listed in [addon/CHANGELOG.md](addon/CHANGELOG.md). Moving from upstream's add-on
+> to this one is a new add-on in Home Assistant, so its `/data` (device registry, the broker
+> certificate a patched device trusts, schedules) has to be copied across; see
+> [Moving from upstream](#moving-from-upstream).
+
 PetKit's devices route everything through PetKit's servers: the app, the history, the notifications,
 and the video from inside your home. This is a stand-in for those servers that runs on your own
 machine. Your device connects to it the same way it connected to them and behaves the same, except
@@ -173,8 +201,11 @@ talk you out of it.
 **Settings → Apps → Install app → ⋮ → Repositories**, add:
 
 ```
-https://github.com/alex-so-3/petkit-local
+https://github.com/404alex/petkit-local
 ```
+
+If upstream's repository is added too, the store lists two add-ons named PetKit Local. This one is
+**PetKit Local (404alex)**; they want the same ports, so run only one.
 
 > Recent Home Assistant releases renamed **Add-ons** to **Apps** in the interface. If your menu still
 > says *Settings → Add-ons → Add-on Store*, you are on an older version — the same ⋮ → Repositories
@@ -297,6 +328,22 @@ the box — useful if you want to add a model, or are just curious.
 The protocol invariants a contributor must not break are summarised in
 [`AGENTS.md`](AGENTS.md).
 
+## Moving from upstream
+
+Home Assistant names an add-on after its repository, so this fork installs as a separate add-on with
+an empty `/data`. Copy the old one across before starting it, or a device patched with the CA
+Certificate patcher will not trust the new broker's certificate. With the old add-on stopped, from
+a shell that can reach Docker (Advanced SSH & Web Terminal with Protection mode off):
+
+```sh
+ha apps stop <old-slug>
+docker run --rm -v /mnt/data/supervisor/apps/data:/d alpine cp -a /d/<old-slug>/. /d/<new-slug>/
+ha apps options <old-slug> --boot manual
+ha apps start <new-slug>
+```
+
+The old `/data` is left as it was, so starting the old add-on again is the way back.
+
 ## 🙌 Contributing
 
 **A report that your model works is worth opening an issue for.** There is exactly one device behind
@@ -330,7 +377,25 @@ would otherwise have had to be answered from scratch:
   It also vendors **[mr-ransel/petkit-ble-reverse-engineering](https://github.com/mr-ransel/petkit-ble-reverse-engineering)**,
   which is the W5 protocol itself: framing, the command set, and what every byte of a status means.
 
-The rest was worked out here, against real firmware and real traffic: the event code tables and the
+**Fork credits.** The code this fork adds over upstream came from other forks, and keeps their
+history: alexmorbo's as the base this was forked from, dernassesmart's picked in with
+`git cherry-pick -x`, so every commit still names its author.
+
+- **[alexmorbo/petkit-local](https://github.com/alexmorbo/petkit-local)** — this fork's base: the
+  D4H single-hopper feed format, the device UTC offset in the state-report reply, the D4H Food Low
+  fix, and the rest of its changes. Found by running a YumShare Solo 2 through proxy mode against
+  the real cloud ([#36](https://github.com/alex-so-3/petkit-local/issues/36)).
+- **[dernassesmart/petkit-local](https://github.com/dernassesmart/petkit-local)** — feeding events
+  reaching Home Assistant, the heartbeat availability fix, and the schedule editor fixes it merged
+  from upstream PR #31.
+- **[nevembalint](https://github.com/nevembalint)** — independently found and documented both D4H
+  bugs in upstream PRs [#29](https://github.com/alex-so-3/petkit-local/pull/29) (the `a` amount
+  key and its ×10 unit) and [#30](https://github.com/alex-so-3/petkit-local/pull/30) (the
+  state-report timezone).
+- **[alex-so-3/petkit-local](https://github.com/alex-so-3/petkit-local)** — everything else in
+  this repository.
+
+The rest was worked out upstream, against real firmware and real traffic: the event code tables and the
 evidence grade on every row, the MQTT authentication, the media encryption and the stitching of a
 visit's chunks, the on-device patches, and the handful of device behaviours that only ever show up
 in a capture.
